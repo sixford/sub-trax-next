@@ -10,7 +10,7 @@ const AddSubscription = () => {
     status: 'active',
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLImageElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData({
       ...formData,
@@ -18,38 +18,35 @@ const AddSubscription = () => {
     })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
       const response = await fetch('/api/subscriptions', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       })
-
-      const result = await response.json()
-      if (result.success){
-        alert('Subscription added successfully')
-        setFormData({ name: '', price: '', renewalDate: '', status: 'active' })
-      } else {
-        alert('Failed to add subscription')
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
       }
+      // Handle successful response
+      console.log('Subscription added successfully')
     } catch (error) {
-      console.error('Failed to add subscription', error)
+      console.error('There was a problem with the fetch operation:', error)
     }
   }
 
-
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Add a New Subscription</h2>
+    <div>
+      <h2>Add Subscription</h2>
       <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block mb-1">Subscription Name</label>
+        <div>
+          <label htmlFor="name">Name</label>
           <input
             type="text"
+            id="name"
             name="name"
             value={formData.name}
             onChange={handleChange}
@@ -57,10 +54,11 @@ const AddSubscription = () => {
             required
           />
         </div>
-        <div className="mb-4">
-          <label className="block mb-1">Price</label>
+        <div>
+          <label htmlFor="price">Price</label>
           <input
-            type="number"
+            type="text"
+            id="price"
             name="price"
             value={formData.price}
             onChange={handleChange}
@@ -68,16 +66,31 @@ const AddSubscription = () => {
             required
           />
         </div>
-        <div className="mb-4">
-          <label className="block mb-1">Renewal Date</label>
+        <div>
+          <label htmlFor="renewalDate">Renewal Date</label>
           <input
             type="date"
+            id="renewalDate"
             name="renewalDate"
             value={formData.renewalDate}
             onChange={handleChange}
             className="border p-2 w-full"
             required
           />
+        </div>
+        <div>
+          <label htmlFor="status">Status</label>
+          <select
+            id="status"
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            className="border p-2 w-full"
+            required
+          >
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
         </div>
         <button type="submit" className="bg-blue-600 text-white p-2 rounded">
           Add Subscription
