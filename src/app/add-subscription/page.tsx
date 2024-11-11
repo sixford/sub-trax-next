@@ -18,7 +18,11 @@ const AddSubscription = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log(formData)
+    const subscriptionData = {
+      ...formData,
+      status: 'active',
+    }
+    console.log(subscriptionData)
   }
 
   return (
