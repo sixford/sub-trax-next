@@ -7,6 +7,7 @@ const AddSubscription = () => {
     name: '',
     price: '',
     renewalDate: '',
+    status: 'active',
   })
 
   const handleChange = (e) => {
@@ -18,12 +19,27 @@ const AddSubscription = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    const subscriptionData = {
-      ...formData,
-      status: 'active',
+    try {
+      const response = await fetch('/api/subscriptions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+
+      const result = await response.json()
+      if (result.success){
+        alert('Subscription added successfully')
+        setFormData({ name: '', price: '', renewalDate: '', status: 'active' })
+      } else {
+        alert('Failed to add subscription')
+      }
+    } catch (error) {
+      console.error('Failed to add subscription', error)
     }
-    console.log(subscriptionData)
   }
+
 
   return (
     <div className="p-4">
