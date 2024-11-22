@@ -27,3 +27,10 @@ const AddSubscriptionPage = () => {
       },
       body: JSON.stringify(subscription)
     })
+
+    if (response.ok) {
+      router.push('/subscriptions')
+    } else {
+      console.error('Failed to add subscription')
+    }
+  }
