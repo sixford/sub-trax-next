@@ -34,3 +34,58 @@ const AddSubscriptionPage = () => {
       console.error('Failed to add subscription')
     }
   }
+
+  return (
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Add Subscription</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium">Name</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full p-2 border rounded"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Price</label>
+          <input
+            type="number"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            className="w-full p-2 border rounded"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Renewal Date</label>
+          <input
+            type="date"
+            value={renewalDate}
+            onChange={(e) => setRenewalDate(e.target.value)}
+            className="w-full p-2 border rounded"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Status</label>
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="w-full p-2 border rounded"
+          >
+            <option value="active">Active</option>
+            <option value="canceled">Canceled</option>
+          </select>
+        </div>
+        <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded">
+          Add Subscription
+        </button>
+      </form>
+    </div>
+  )
+}
+
+export default AddSubscriptionPage
