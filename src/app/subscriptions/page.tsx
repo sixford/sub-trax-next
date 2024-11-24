@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 
 interface Subscription {
   _id: string
@@ -29,6 +30,11 @@ const SubscriptionDashboard = () => {
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Your Subscriptions</h2>
+      <Link href="/subscriptions/add">
+        <button className="bg-green-500 text-white py-2 px-4 rounded mb-4">
+          Add Subscription
+        </button>
+      </Link>
       <div className="subscription-list">
         {subscriptions.map((sub) => (
           <div key={sub._id} className="p-2 border mb-2 rounded">
