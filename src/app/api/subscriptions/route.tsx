@@ -37,7 +37,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   const { id } = params
 
   try {
-    const deletedSubscription = await Subscription.findByIdAndDelete(id);
+    const deletedSubscription = await Subscription.findByIdAndDelete(id)
 
     if (!deletedSubscription) {
       return NextResponse.json({ success: false, message: 'Subscription not found' }, { status: 404 })
@@ -45,6 +45,9 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 
     return NextResponse.json({ success: true, message: 'Subscription deleted' })
   } catch (error) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    )
   }
 }
