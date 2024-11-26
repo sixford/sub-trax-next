@@ -13,8 +13,9 @@ interface Subscription {
 
 const SubscriptionDashboard = () => {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
-  const [filter, setFilter] = useState<'all' | 'active' | 'cancelled'>('all')
+  const [filter, setFilter] = useState<'all' | 'active' | 'canceled'>('all')
   const [sortBy, setSortBy] = useState<'renewalDate' | 'price'>('renewalDate')
+
   useEffect(() => {
     const fetchSubscriptions = async () => {
       const response = await fetch('/api/subscriptions')
@@ -33,27 +34,30 @@ const SubscriptionDashboard = () => {
     const confirmDelete = confirm('Are you sure you want to delete this subscription?')
     if (!confirmDelete) return
 
-    const response = await fetch(`/api/subscriptions/${id}`, {
-      method: 'DELETE'
-    })
+    try {
+      const response = await fetch(`/api/subscriptions/${id}`, {
+        method: 'DELETE',
+      })
 
-    if (response.ok) {
-      setSubscriptions((prev) => prev.filter((sub) => sub._id !== id))
-    } else {
-      console.error('Failed to delete subscription:', await response.json())
+      if (response.ok) {
+        setSubscriptions((prev) => prev.filter((sub) => sub._id !== id))
+      } else {
+        console.error('Failed to delete subscription:', await response.json())
+      }
+    } catch (error) {
+      console.error('An error occurred:', error)
     }
-  } catch (error) {
-    console.error('An error occured:', error)
   }
 
   const filteredSubscriptions = subscriptions.filter((sub) =>
-  filter === 'all' ? true : sub.status === filter)
+    filter === 'all' ? true : sub.status === filter
+  )
 
   const sortedSubscriptions = [...filteredSubscriptions].sort((a, b) => {
     if (sortBy === 'renewalDate') {
       return new Date(a.renewalDate).getTime() - new Date(b.renewalDate).getTime()
     }
-    return a.price - b.price
+    return a.price - b.price;
   })
 
   return (
@@ -84,9 +88,9 @@ const SubscriptionDashboard = () => {
           Active
         </button>
         <button
-          onClick={() => setFilter('cancelled')}
+          onClick={() => setFilter('canceled')}
           className={`px-4 py-2 rounded ${
-            filter === 'cancelled' ? 'bg-blue-500 text-white' : 'bg-gray-200'
+            filter === 'canceled' ? 'bg-blue-500 text-white' : 'bg-gray-200'
           }`}
         >
           Cancelled
