@@ -29,6 +29,24 @@ const SubscriptionDashboard = () => {
     fetchSubscriptions()
   }, [])
 
+  const handleDelete = async (id: string) => {
+    const confirmDelete = confirm('Are you sure you want to delete this subscription?')
+    if (!confirmDelete) return
+
+    const response = await fetch(`/api/subscriptions/${id}`, {
+      method: 'DELETE'
+    })
+
+    if (response.ok) {
+      setSubscriptions((prev) => prev.filter((sub) => sub._id !== id))
+    } else {
+      console.error('Failed to delete subscription')
+    }
+  }
+
+  const filteredSubscriptions = subscriptions.filter((sub) =>
+  filter === 'all' ? true : sub.status === filter)
+
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Your Subscriptions</h2>
