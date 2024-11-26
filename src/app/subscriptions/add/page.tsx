@@ -31,6 +31,7 @@ const AddSubscriptionPage = () => {
     if (response.ok) {
       router.push('/subscriptions')
     } else {
+      const errorData = await response.json()
       console.error('Failed to add subscription')
     }
   }
