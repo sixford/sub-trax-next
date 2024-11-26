@@ -57,18 +57,63 @@ const SubscriptionDashboard = () => {
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Your Subscriptions</h2>
-      <Link href="/subscriptions/add">
-        <button className="bg-green-500 text-white py-2 px-4 rounded mb-4">
-          Add Subscription
+      <div className="mb-4">
+        <Link href="/subscriptions/add">
+          <button className="bg-green-500 text-white py-2 px-4 rounded">
+            Add Subscription
+          </button>
+        </Link>
+      </div>
+      <div className="mb-4 flex space-x-4">
+        <button
+          onClick={() => setFilter('all')}
+          className={`px-4 py-2 rounded ${
+            filter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200'
+          }`}
+        >
+          All
         </button>
-      </Link>
+        <button
+          onClick={() => setFilter('active')}
+          className={`px-4 py-2 rounded ${
+            filter === 'active' ? 'bg-blue-500 text-white' : 'bg-gray-200'
+          }`}
+        >
+          Active
+        </button>
+        <button
+          onClick={() => setFilter('cancelled')}
+          className={`px-4 py-2 rounded ${
+            filter === 'cancelled' ? 'bg-blue-500 text-white' : 'bg-gray-200'
+          }`}
+        >
+          Cancelled
+        </button>
+      </div>
+      <div className="mb-4">
+        <label className="mr-2">Sort By:</label>
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value as 'renewalDate' | 'price')}
+          className="p-2 border rounded"
+        >
+          <option value="renewalDate">Renewal Date</option>
+          <option value="price">Price</option>
+        </select>
+      </div>
       <div className="subscription-list">
-        {subscriptions.map((sub) => (
+        {sortedSubscriptions.map((sub) => (
           <div key={sub._id} className="p-2 border mb-2 rounded">
             <h3 className="font-bold">{sub.name}</h3>
             <p>Price: ${sub.price}</p>
             <p>Renewal Date: {new Date(sub.renewalDate).toLocaleDateString()}</p>
             <p>Status: {sub.status}</p>
+            <button
+              className="bg-red-500 text-white py-1 px-3 rounded mt-2"
+              onClick={() => handleDelete(sub._id)}
+            >
+              Delete
+            </button>
           </div>
         ))}
       </div>
