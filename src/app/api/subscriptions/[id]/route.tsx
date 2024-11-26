@@ -3,10 +3,11 @@ import dbConnect from '@/lib/dbConnect'
 import Subscription from '@/models/Subscription'
 
 // Handle DELETE request by ID
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, context: { params: { id: string } }) {
   await dbConnect()
 
-  const { id } = params
+
+  const { id } = await context.params
 
   try {
     const deletedSubscription = await Subscription.findByIdAndDelete(id)
@@ -22,10 +23,10 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 }
 
 // Handle GET request by ID
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, context: { params: { id: string } }) {
   await dbConnect()
 
-  const { id } = params
+  const { id } = await context.params
 
   try {
     const subscription = await Subscription.findById(id)
@@ -41,10 +42,10 @@ export async function GET(request: Request, { params }: { params: { id: string }
 }
 
 // Handle PATCH request by ID
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
-  await dbConnect();
+export async function PATCH(request: Request, context: { params: { id: string } }) {
+  await dbConnect()
 
-  const { id } = params;
+  const { id } = await context.params
 
   try {
     const data = await request.json();
