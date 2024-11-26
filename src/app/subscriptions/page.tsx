@@ -40,8 +40,10 @@ const SubscriptionDashboard = () => {
     if (response.ok) {
       setSubscriptions((prev) => prev.filter((sub) => sub._id !== id))
     } else {
-      console.error('Failed to delete subscription')
+      console.error('Failed to delete subscription:', await response.json())
     }
+  } catch (error) {
+    console.error('An error occured:', error)
   }
 
   const filteredSubscriptions = subscriptions.filter((sub) =>
