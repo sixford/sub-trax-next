@@ -20,7 +20,7 @@ const AddSubscriptionPage = () => {
       status,
     }
 
-    const response = await fetch('api/subscriptions', {
+    const response = await fetch('/api/subscriptions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
