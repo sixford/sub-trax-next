@@ -47,6 +47,13 @@ const SubscriptionDashboard = () => {
   const filteredSubscriptions = subscriptions.filter((sub) =>
   filter === 'all' ? true : sub.status === filter)
 
+  const sortedSubscriptions = [...filteredSubscriptions].sort((a, b) => {
+    if (sortBy === 'renewalDate') {
+      return new Date(a.renewalDate).getTime() - new Date(b.renewalDate).getTime()
+    }
+    return a.price - b.price
+  })
+
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Your Subscriptions</h2>
