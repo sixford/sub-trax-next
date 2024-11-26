@@ -13,6 +13,8 @@ interface Subscription {
 
 const SubscriptionDashboard = () => {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
+  const [filter, setFilter] = useState<'all' | 'active' | 'cancelled'>('all')
+  const [sortBy, setSortBy] = useState<'renewalDate' | 'price'>('renewalDate')
   useEffect(() => {
     const fetchSubscriptions = async () => {
       const response = await fetch('/api/subscriptions')
