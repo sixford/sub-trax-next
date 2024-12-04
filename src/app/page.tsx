@@ -23,7 +23,7 @@ const HeroPage = () => {
         </h1>
         <p className="text-lg mb-8 text-purpleMain">
           Effortlessly track your subscriptions and manage your spending in one
-          place.
+          place...
         </p>
         <div className="flex justify-center space-x-4">
           <Link href="/register">
