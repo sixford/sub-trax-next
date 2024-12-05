@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import './lava-lamp.css';
 
 :root {
   --background: #ffffff;
@@ -16,6 +17,7 @@
 
 body {
   color: var(--foreground);
-  background: var(--background);
+  background: none;
   font-family: Arial, Helvetica, sans-serif;
 }
+
