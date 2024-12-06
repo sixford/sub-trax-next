@@ -73,7 +73,10 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   const { id } = params
 
   try {
-    const deletedSubscription = await Subscription.findByIdAndDelete(id)
+    const deletedSubscription = await Subscription.findOneAndDelete({
+      _id: id,
+      user: session.user.id, // Ensure subscription belongs to user
+    })
 
     if (!deletedSubscription) {
       return NextResponse.json({ success: false, message: 'Subscription not found' }, { status: 404 })
