@@ -7,6 +7,15 @@ import Subscription from '@/models/Subscription'
 export async function GET() {
   await dbConnect()
 
+  const session = await getServerSession(authOptions)
+
+  if (!session) {
+    return NextResponse.json(
+      { success: false, message: 'Unauthorized' },
+      { status: 401 }
+    )
+  }
+
   try {
     const subscriptions = await Subscription.find({})
     return NextResponse.json({ success: true, data: subscriptions })
