@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useSession, signOut } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 
 interface Subscription {
   _id: string
@@ -12,23 +14,39 @@ interface Subscription {
 }
 
 const SubscriptionDashboard = () => {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
   const [filter, setFilter] = useState<'all' | 'active' | 'canceled'>('all')
   const [sortBy, setSortBy] = useState<'renewalDate' | 'price'>('renewalDate')
 
   useEffect(() => {
-    const fetchSubscriptions = async () => {
-      const response = await fetch('/api/subscriptions')
-      const result = await response.json()
-      if (result.success) {
-        setSubscriptions(result.data)
-      } else {
-        console.error('Failed to fetch subscriptions')
-      }
+    // Redirect if not authenticated
+    if (status === 'unauthenticated') {
+      router.push('/login')
     }
+  }, [status, router])
 
-    fetchSubscriptions()
-  }, [])
+  useEffect(() => {
+    if (status === 'authenticated') {
+      const fetchSubscriptions = async () => {
+        const response = await fetch('/api/subscriptions', {
+          headers: {
+            Authorization: `Bearer ${session?.user.id}`, // Include user ID in the request
+          },
+        })
+        const result = await response.json()
+        if (result.success) {
+          setSubscriptions(result.data)
+        } else {
+          console.error('Failed to fetch subscriptions')
+        }
+      }
+
+      fetchSubscriptions()
+    }
+  }, [status, session])
 
   const handleDelete = async (id: string) => {
     const confirmDelete = confirm('Are you sure you want to delete this subscription?')
@@ -37,12 +55,15 @@ const SubscriptionDashboard = () => {
     try {
       const response = await fetch(`/api/subscriptions/${id}`, {
         method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${session?.user.id}`, // Include user ID in the request
+        },
       })
 
       if (response.ok) {
         setSubscriptions((prev) => prev.filter((sub) => sub._id !== id))
       } else {
-        const errorData = await response.json()
+        const errorData = await response.json();
         console.error('Failed to delete subscription:', errorData)
       }
     } catch (error) {
@@ -58,18 +79,28 @@ const SubscriptionDashboard = () => {
     if (sortBy === 'renewalDate') {
       return new Date(a.renewalDate).getTime() - new Date(b.renewalDate).getTime()
     }
-    return a.price - b.price;
+    return a.price - b.price
   })
+
+  if (status === 'loading') {
+    return <p>Loading...</p>
+  }
 
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Your Subscriptions</h2>
-      <div className="mb-4">
+      <div className="mb-4 flex justify-between">
         <Link href="/subscriptions/add">
           <button className="bg-green-500 text-white py-2 px-4 rounded">
             Add Subscription
           </button>
         </Link>
+        <button
+          onClick={() => signOut()}
+          className="bg-red-500 text-white py-2 px-4 rounded"
+        >
+          Sign Out
+        </button>
       </div>
       <div className="mb-4 flex space-x-4">
         <button
@@ -112,7 +143,7 @@ const SubscriptionDashboard = () => {
         {sortedSubscriptions.map((sub) => (
           <div key={sub._id} className="p-2 border mb-2 rounded">
             <h3 className="font-bold">{sub.name}</h3>
-            <p>Price: ${sub.price}</p>
+            <p>Price: £{sub.price}</p>
             <p>Renewal Date: {new Date(sub.renewalDate).toLocaleDateString()}</p>
             <p>Status: {sub.status}</p>
             <button
@@ -129,3 +160,4 @@ const SubscriptionDashboard = () => {
 }
 
 export default SubscriptionDashboard
+
