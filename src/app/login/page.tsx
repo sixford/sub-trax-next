@@ -24,11 +24,11 @@ const LoginPage = () => {
     const result = await signIn('credentials', {
       email,
       password,
-      redirect: false, // Manual redirection
+      redirect: false, // Disable automatic redirection
     })
 
     if (result?.error) {
-      setError(result.error || 'Invalid credentials')
+      setError(result.error || 'Invalid email or password')
     } else {
       router.push('/subscriptions')
     }
@@ -73,5 +73,8 @@ const LoginPage = () => {
 }
 
 export default LoginPage
+
+
+
 
 

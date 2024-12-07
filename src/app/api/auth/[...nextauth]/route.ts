@@ -9,46 +9,48 @@ export const authOptions = {
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
+        email: { label: 'Email', type: 'email', required: true },
+        password: { label: 'Password', type: 'password', required: true },
       },
       async authorize(credentials) {
         await dbConnect()
 
         // Check if user exists
         const user = await User.findOne({ email: credentials?.email })
-
         if (!user) {
           throw new Error('No user found with this email')
         }
 
         // Validate password
-        const isValid = await bcrypt.compare(credentials?.password, user.password)
-        if (!isValid) {
-          throw new Error('Invalid password');
+        const isValidPassword = await bcrypt.compare(credentials?.password, user.password)
+        if (!isValidPassword) {
+          throw new Error('Invalid password')
         }
 
-        return { id: user.id, email: user.email };
+        return { id: user.id, email: user.email }
       },
     }),
   ],
-  secret: process.env.NEXTAUTH_SECRET, // .env.local
+  secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: 'jwt',
   },
   callbacks: {
     async jwt({ token, user }) {
-      if (user) token.id = user.id;
+      if (user) {
+        token.id = user.id
+      }
       return token;
     },
     async session({ session, token }) {
-      if (token) session.user.id = token.id;
+      session.user.id = token.id
       return session;
     },
   },
 }
 
+// Correctly export both GET and POST
 const handler = NextAuth(authOptions)
-
 export { handler as GET, handler as POST }
+
 
