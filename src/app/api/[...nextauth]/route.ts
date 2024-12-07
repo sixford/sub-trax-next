@@ -4,27 +4,37 @@ import dbConnect from '@/lib/dbConnect'
 import User from '@/models/User'
 import bcrypt from 'bcryptjs'
 
-const handler = NextAuth({
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        email: { label: 'Email', type: 'text' },
+        email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
         await dbConnect()
 
+        // Check if user exists
         const user = await User.findOne({ email: credentials?.email })
-        if (user && (await bcrypt.compare(credentials?.password, user.password))) {
-          return { id: user.id, email: user.email }; // Return user data on successful login
+
+        if (!user) {
+          throw new Error('No user found with this email')
         }
-        return null // Return null if login fails
+
+        // Validate password
+        const isValid = await bcrypt.compare(credentials?.password, user.password)
+        if (!isValid) {
+          throw new Error('Invalid password');
+        }
+
+        return { id: user.id, email: user.email };
       },
     }),
   ],
+  secret: process.env.NEXTAUTH_SECRET, // .env.local
   session: {
-    strategy: 'jwt', // Use JWT for session management
+    strategy: 'jwt',
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -32,11 +42,13 @@ const handler = NextAuth({
       return token;
     },
     async session({ session, token }) {
-      if (token) session.user.id = token.id
+      if (token) session.user.id = token.id;
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET, // Set in .env.local
-})
+}
+
+const handler = NextAuth(authOptions)
 
 export { handler as GET, handler as POST }
+
