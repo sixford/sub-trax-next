@@ -40,16 +40,16 @@ export const authOptions = {
       if (user) {
         token.id = user.id
       }
-      return token;
+      return token
     },
     async session({ session, token }) {
       session.user.id = token.id
-      return session;
+      return session
     },
   },
 }
 
-// Correctly export both GET and POST
+// GET and POST
 const handler = NextAuth(authOptions)
 export { handler as GET, handler as POST }
 
