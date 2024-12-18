@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import dbConnect from '@/lib/dbConnect'
 import Subscription from '@/models/Subscription'
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 
 // Get request function
 
@@ -33,9 +33,9 @@ export async function POST(request: Request) {
 
   const session = await getServerSession(authOptions)
 
-  if (!session) {
+  if (!session || !session.user) {
     return NextResponse.json(
-      { success: false, message: 'Unauthorized' },
+      { success: false, error: 'Not authenticated' },
       { status: 401 }
     )
   }
@@ -44,9 +44,10 @@ export async function POST(request: Request) {
     const data = await request.json()
     const newSubscription = await Subscription.create({
       ...data,
-      user: session.user.id, // Link subscription to user
+      userId: session.user.id, // Attached user
     })
-    return NextResponse.json({ success: true, data: newSubscription });
+
+    return NextResponse.json({ success: true, data: newSubscription })
   } catch (error) {
     return NextResponse.json(
       { success: false, error: error.message },
