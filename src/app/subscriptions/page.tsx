@@ -10,7 +10,7 @@ interface Subscription {
   name: string
   price: number
   renewalDate: string
-  status: 'active' | 'canceled'
+  status: 'active' | 'cancelled'
 }
 
 const SubscriptionDashboard = () => {
@@ -18,7 +18,7 @@ const SubscriptionDashboard = () => {
   const router = useRouter()
 
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
-  const [filter, setFilter] = useState<'all' | 'active' | 'canceled'>('all')
+  const [filter, setFilter] = useState<'all' | 'active' | 'cancelled'>('all')
   const [sortBy, setSortBy] = useState<'renewalDate' | 'price'>('renewalDate')
 
   useEffect(() => {
@@ -103,10 +103,10 @@ const SubscriptionDashboard = () => {
         </button>
       </div>
       <div className="mb-4 flex space-x-4">
-        {['all', 'active', 'canceled'].map((status) => (
+        {['all', 'active', 'cancelled'].map((status) => (
           <button
             key={status}
-            onClick={() => setFilter(status as 'all' | 'active' | 'canceled')}
+            onClick={() => setFilter(status as 'all' | 'active' | 'cancelled')}
             className={`px-4 py-2 rounded ${
               filter === status ? 'bg-blue-500 text-white' : 'bg-gray-200'
             }`}
