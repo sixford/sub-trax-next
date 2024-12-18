@@ -6,23 +6,26 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 
 // Get request function
 
-export async function GET() {
+export async function GET(request: Request) {
   await dbConnect()
 
   const session = await getServerSession(authOptions)
 
-  if (!session) {
+  if (!session || !session.user) {
     return NextResponse.json(
-      { success: false, message: 'Unauthorised' },
+      { success: false, error: 'Not authenticated' },
       { status: 401 }
     )
   }
 
   try {
-    const subscriptions = await Subscription.find({ user: session.user.id })
+    const subscriptions = await Subscription.find({ userId: session.user.id })
     return NextResponse.json({ success: true, data: subscriptions })
   } catch (error) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    )
   }
 }
 
