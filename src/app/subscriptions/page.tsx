@@ -32,10 +32,12 @@ const SubscriptionDashboard = () => {
     if (status === 'authenticated') {
       const fetchSubscriptions = async () => {
         const response = await fetch('/api/subscriptions', {
+          method: 'GET',
           headers: {
-            Authorization: `Bearer ${session?.user.id}`, // Include user ID in the request
+            'Content-Type': 'application/json',
           },
         })
+        
         const result = await response.json()
         if (result.success) {
           setSubscriptions(result.data)
@@ -56,14 +58,14 @@ const SubscriptionDashboard = () => {
       const response = await fetch(`/api/subscriptions/${id}`, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${session?.user.id}`, // Include user ID in the request
+          'Content-Type': 'application/json',
         },
       })
 
       if (response.ok) {
         setSubscriptions((prev) => prev.filter((sub) => sub._id !== id))
       } else {
-        const errorData = await response.json();
+        const errorData = await response.json()
         console.error('Failed to delete subscription:', errorData)
       }
     } catch (error) {
@@ -81,11 +83,9 @@ const SubscriptionDashboard = () => {
     }
     return a.price - b.price
   })
-
   if (status === 'loading') {
     return <p>Loading...</p>
   }
-
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Your Subscriptions</h2>
@@ -103,30 +103,17 @@ const SubscriptionDashboard = () => {
         </button>
       </div>
       <div className="mb-4 flex space-x-4">
-        <button
-          onClick={() => setFilter('all')}
-          className={`px-4 py-2 rounded ${
-            filter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200'
-          }`}
-        >
-          All
-        </button>
-        <button
-          onClick={() => setFilter('active')}
-          className={`px-4 py-2 rounded ${
-            filter === 'active' ? 'bg-blue-500 text-white' : 'bg-gray-200'
-          }`}
-        >
-          Active
-        </button>
-        <button
-          onClick={() => setFilter('canceled')}
-          className={`px-4 py-2 rounded ${
-            filter === 'canceled' ? 'bg-blue-500 text-white' : 'bg-gray-200'
-          }`}
-        >
-          Cancelled
-        </button>
+        {['all', 'active', 'canceled'].map((status) => (
+          <button
+            key={status}
+            onClick={() => setFilter(status as 'all' | 'active' | 'canceled')}
+            className={`px-4 py-2 rounded ${
+              filter === status ? 'bg-blue-500 text-white' : 'bg-gray-200'
+            }`}
+          >
+            {status.charAt(0).toUpperCase() + status.slice(1)}
+          </button>
+        ))}
       </div>
       <div className="mb-4">
         <label className="mr-2">Sort By:</label>
@@ -140,24 +127,29 @@ const SubscriptionDashboard = () => {
         </select>
       </div>
       <div className="subscription-list">
-        {sortedSubscriptions.map((sub) => (
-          <div key={sub._id} className="p-2 border mb-2 rounded">
-            <h3 className="font-bold">{sub.name}</h3>
-            <p>Price: £{sub.price}</p>
-            <p>Renewal Date: {new Date(sub.renewalDate).toLocaleDateString()}</p>
-            <p>Status: {sub.status}</p>
-            <button
-              className="bg-red-500 text-white py-1 px-3 rounded mt-2"
-              onClick={() => handleDelete(sub._id)}
-            >
-              Delete
-            </button>
-          </div>
-        ))}
+        {sortedSubscriptions.length ? (
+          sortedSubscriptions.map((sub) => (
+            <div key={sub._id} className="p-2 border mb-2 rounded">
+              <h3 className="font-bold">{sub.name}</h3>
+              <p>Price: £{sub.price}</p>
+              <p>Renewal Date: {new Date(sub.renewalDate).toLocaleDateString()}</p>
+              <p>Status: {sub.status}</p>
+              <button
+                className="bg-red-500 text-white py-1 px-3 rounded mt-2"
+                onClick={() => handleDelete(sub._id)}
+              >
+                Delete
+              </button>
+            </div>
+          ))
+        ) : (
+          <p>No subscriptions found.</p>
+        )}
       </div>
     </div>
   )
 }
 
 export default SubscriptionDashboard
+
 
