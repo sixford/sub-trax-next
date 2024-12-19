@@ -80,3 +80,5 @@ const MonthlySpendChart = () => {
     }
     return <Line data={chartData} options={chartOptions} />
   } 
+
+export default MonthlySpendChart
