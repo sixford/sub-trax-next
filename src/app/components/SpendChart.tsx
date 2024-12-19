@@ -66,5 +66,17 @@ const MonthlySpendChart = () => {
       ]
     }
 
+    const chartOptions = {
+      responsive: true,
+      plugins: {
+        legend: {
+          postions: 'top' as const,
+        },
+        title: {
+          display: true,
+          text: 'Monthly Spending',
+        },
+      },
+    }
+    return <Line data={chartData} options={chartOptions} />
   } 
-}
