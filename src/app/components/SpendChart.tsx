@@ -52,7 +52,19 @@ const MonthlySpendChart = () => {
 
     fetchSubscriptions()
   }, [])
-
+    const chartData = {
+      labels,
+      datasets: [
+        {
+          label: 'Monthly Spending (£)',
+          data: spendingData,
+          borderColor: '#6c36e8',
+          backgroundColor: 'rgba(108, 54, 232, 0.3)',
+          fill: true,
+          tension: 0.4,
+        }
+      ]
+    }
 
   } 
 }
