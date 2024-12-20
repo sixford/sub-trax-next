@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import SpendingChart from '../components/SpendChart'
 
 interface Subscription {
   _id: string
@@ -16,7 +17,6 @@ interface Subscription {
 const SubscriptionDashboard = () => {
   const { data: session, status } = useSession()
   const router = useRouter()
-
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
   const [filter, setFilter] = useState<'all' | 'active' | 'cancelled'>('all')
   const [sortBy, setSortBy] = useState<'renewalDate' | 'price'>('renewalDate')
@@ -89,6 +89,12 @@ const SubscriptionDashboard = () => {
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Your Subscriptions</h2>
+
+      {/* Monthly Spending Chart */}
+      <div className="mb-8">
+        <SpendingChart />
+      </div>
+
       <div className="mb-4 flex justify-between">
         <Link href="/subscriptions/add">
           <button className="bg-green-500 text-white py-2 px-4 rounded">
@@ -102,6 +108,7 @@ const SubscriptionDashboard = () => {
           Sign Out
         </button>
       </div>
+
       <div className="mb-4 flex space-x-4">
         {['all', 'active', 'cancelled'].map((status) => (
           <button
@@ -115,6 +122,7 @@ const SubscriptionDashboard = () => {
           </button>
         ))}
       </div>
+
       <div className="mb-4">
         <label className="mr-2">Sort By:</label>
         <select
@@ -126,6 +134,7 @@ const SubscriptionDashboard = () => {
           <option value="price">Price</option>
         </select>
       </div>
+
       <div className="subscription-list">
         {sortedSubscriptions.length ? (
           sortedSubscriptions.map((sub) => (
