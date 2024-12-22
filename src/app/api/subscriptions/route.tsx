@@ -4,8 +4,7 @@ import Subscription from '@/models/Subscription'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 
-// Get request function
-
+// GET: Fetch all subscriptions
 export async function GET(request: Request) {
   await dbConnect()
 
@@ -19,7 +18,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const subscriptions = await Subscription.find({ userId: session.user.id })
+    const subscriptions = await Subscription.find({ userId: session.user.id }) // Filter by userId
     return NextResponse.json({ success: true, data: subscriptions })
   } catch (error) {
     return NextResponse.json(
@@ -29,8 +28,7 @@ export async function GET(request: Request) {
   }
 }
 
-// Add Subscription function
-
+// POST: Add a new subscription
 export async function POST(request: Request) {
   await dbConnect()
 
@@ -47,7 +45,7 @@ export async function POST(request: Request) {
     const data = await request.json()
     const newSubscription = await Subscription.create({
       ...data,
-      userId: session.user.id, // Attached user
+      userId: session.user.id, // Associate with logged-in user
     })
 
     return NextResponse.json({ success: true, data: newSubscription })
@@ -59,17 +57,18 @@ export async function POST(request: Request) {
   }
 }
 
-// DELETE function
-
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+// DELETE
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   await dbConnect()
-
 
   const session = await getServerSession(authOptions)
 
-  if (!session) {
+  if (!session || !session.user) {
     return NextResponse.json(
-      { success: false, message: 'Unauthorized' },
+      { success: false, message: 'Unauthorised' },
       { status: 401 }
     )
   }
@@ -79,11 +78,14 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   try {
     const deletedSubscription = await Subscription.findOneAndDelete({
       _id: id,
-      user: session.user.id, // Ensure subscription belongs to user
+      userId: session.user.id,
     })
 
     if (!deletedSubscription) {
-      return NextResponse.json({ success: false, message: 'Subscription not found' }, { status: 404 })
+      return NextResponse.json(
+        { success: false, message: 'Subscription not found' },
+        { status: 404 }
+      )
     }
 
     return NextResponse.json({ success: true, message: 'Subscription deleted' })
