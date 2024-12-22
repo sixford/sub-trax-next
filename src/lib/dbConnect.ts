@@ -6,6 +6,7 @@ if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env.local')
 }
 
+// Use a global variable to maintain a cached connection across hot reloads in development
 let cached = global.mongoose
 
 if (!cached) {
@@ -14,17 +15,14 @@ if (!cached) {
 
 async function dbConnect() {
   if (cached.conn) {
-    console.log('Using existing database connection');
+    console.log('Using existing database connection')
     return cached.conn;
   }
 
   if (!cached.promise) {
-    console.log('Establishing new database connection');
+    console.log('Establishing new database connection')
     cached.promise = mongoose
-      .connect(MONGODB_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      })
+      .connect(MONGODB_URI)
       .then((mongoose) => {
         console.log('MongoDB connected successfully')
         return mongoose
@@ -40,3 +38,4 @@ async function dbConnect() {
 }
 
 export default dbConnect
+
