@@ -37,8 +37,13 @@ const MonthlySpendChart = () => {
         const monthlyData: Record<string, number> = {}
 
         result.data.forEach((sub: Subscription) => {
-          const startDate = new Date(sub.renewalDate);
-          const endDate = sub.cancellationDate ? new Date(sub.cancellationDate) : new Date()
+          const startDate = new Date(sub.renewalDate)
+          const endDate = sub.status === 'active'
+            ? new Date() // Active subscriptions should include up to the current month
+            : sub.cancellationDate
+              ? new Date(sub.cancellationDate)
+              : new Date() // Default to current if no cancellation date
+          
           const interval = sub.renewalInterval === 'monthly' ? 1 : 12
 
           while (startDate <= endDate) {
@@ -49,45 +54,65 @@ const MonthlySpendChart = () => {
 
             monthlyData[monthYear] = (monthlyData[monthYear] || 0) + sub.price
 
-            // Add renewal interval
+            // Increment date by renewal interval
             startDate.setMonth(startDate.getMonth() + interval)
           }
         })
 
-        setLabels(Object.keys(monthlyData).sort())
-        setSpendingData(Object.values(monthlyData))
+        // Sort months and update state
+        const sortedLabels = Object.keys(monthlyData).sort((a, b) => {
+          const dateA = new Date(a)
+          const dateB = new Date(b)
+          return dateA.getTime() - dateB.getTime()
+        })
+
+        setLabels(sortedLabels)
+        setSpendingData(sortedLabels.map((label) => monthlyData[label]))
       }
     }
 
     fetchSubscriptions()
   }, [])
-    const chartData = {
-      labels,
-      datasets: [
-        {
-          label: 'Monthly Spending (£)',
-          data: spendingData,
-          borderColor: '#6c36e8',
-          backgroundColor: 'rgba(108, 54, 232, 0.3)',
-          fill: true,
-          tension: 0.4,
-        }
-      ]
-    }
 
-    const chartOptions = {
-      responsive: true,
-      plugins: {
-        legend: {
-          postions: 'top' as const,
-        },
-        title: {
-          display: true,
-          text: 'Monthly Spending',
+  const chartData = {
+    labels,
+    datasets: [
+      {
+        label: 'Monthly Spending (£)',
+        data: spendingData,
+        borderColor: '#6c36e8',
+        backgroundColor: 'rgba(108, 54, 232, 0.3)',
+        fill: true,
+        tension: 0.4,
+      },
+    ],
+  }
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: true,
+        text: 'Monthly Spending',
+      },
+    },
+    scales: {
+      x: {
+        grid: {
+          display: false,
         },
       },
-    }
-    return <Line data={chartData} options={chartOptions} />
-  } 
+      y: {
+        beginAtZero: true,
+      },
+    },
+  }
+
+  return <Line data={chartData} options={chartOptions} />
+}
 
 export default MonthlySpendChart
+
