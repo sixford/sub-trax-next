@@ -12,6 +12,7 @@ interface Subscription {
   price: number
   renewalDate: string
   status: 'active' | 'cancelled'
+  cancellationDate?: string
 }
 
 const SubscriptionDashboard = () => {
@@ -37,7 +38,7 @@ const SubscriptionDashboard = () => {
             'Content-Type': 'application/json',
           },
         })
-        
+
         const result = await response.json()
         if (result.success) {
           setSubscriptions(result.data)
@@ -56,17 +57,24 @@ const SubscriptionDashboard = () => {
 
     try {
       const response = await fetch(`/api/subscriptions/${id}`, {
-        method: 'DELETE',
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ status: 'cancelled', cancellationDate: new Date().toISOString() }),
       })
 
       if (response.ok) {
-        setSubscriptions((prev) => prev.filter((sub) => sub._id !== id))
+        setSubscriptions((prev) =>
+          prev.map((sub) =>
+            sub._id === id
+              ? { ...sub, status: 'cancelled', cancellationDate: new Date().toISOString() }
+              : sub
+          )
+        )
       } else {
         const errorData = await response.json()
-        console.error('Failed to delete subscription:', errorData)
+        console.error('Failed to cancel subscription:', errorData)
       }
     } catch (error) {
       console.error('An error occurred:', error)
@@ -114,9 +122,8 @@ const SubscriptionDashboard = () => {
           <button
             key={status}
             onClick={() => setFilter(status as 'all' | 'active' | 'cancelled')}
-            className={`px-4 py-2 rounded ${
-              filter === status ? 'bg-blue-500 text-white' : 'bg-gray-200'
-            }`}
+            className={`px-4 py-2 rounded ${filter === status ? 'bg-blue-500 text-white' : 'bg-gray-200'
+              }`}
           >
             {status.charAt(0).toUpperCase() + status.slice(1)}
           </button>
