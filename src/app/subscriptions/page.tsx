@@ -12,6 +12,7 @@ interface Subscription {
   price: number
   renewalDate: string
   status: 'active' | 'cancelled'
+  category: string
   cancellationDate?: string
 }
 
@@ -19,8 +20,10 @@ const SubscriptionDashboard = () => {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
-  const [filter, setFilter] = useState<'all' | 'active' | 'cancelled'>('all')
+  const [filter, setFilter] = useState<'all' | 'active' | 'cancelled' | string>('all')
   const [sortBy, setSortBy] = useState<'renewalDate' | 'price'>('renewalDate')
+
+  const categories = ['All', 'Entertainment', 'Utilities', 'Food', 'Software', 'Transport', 'Other']
 
   useEffect(() => {
     // Redirect if not authenticated
@@ -81,9 +84,11 @@ const SubscriptionDashboard = () => {
     }
   }
 
-  const filteredSubscriptions = subscriptions.filter((sub) =>
-    filter === 'all' ? true : sub.status === filter
-  )
+  const filteredSubscriptions = subscriptions.filter((sub) => {
+    if (filter === 'all') return true
+    if (filter === 'active' || filter === 'cancelled') return sub.status === filter
+    return sub.category === filter // Match category filter
+  })
 
   const sortedSubscriptions = [...filteredSubscriptions].sort((a, b) => {
     if (sortBy === 'renewalDate') {
@@ -120,15 +125,17 @@ const SubscriptionDashboard = () => {
       </div>
 
       <div className="mb-4 flex space-x-4">
-        {['all', 'active', 'cancelled'].map((status) => (
+        {categories.map((category) => (
           <button
-            key={status}
-            onClick={() => setFilter(status as 'all' | 'active' | 'cancelled')}
+            key={category}
+            onClick={() => setFilter(category === 'All' ? 'all' : category)}
             className={`px-4 py-2 rounded ${
-              filter === status ? 'bg-blue-500 text-white' : 'bg-gray-200'
+              filter === category || (filter === 'all' && category === 'All')
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200'
             }`}
           >
-            {status.charAt(0).toUpperCase() + status.slice(1)}
+            {category}
           </button>
         ))}
       </div>
@@ -153,6 +160,7 @@ const SubscriptionDashboard = () => {
               <p>Price: £{sub.price}</p>
               <p>Renewal Date: {new Date(sub.renewalDate).toLocaleDateString()}</p>
               <p>Status: {sub.status}</p>
+              <p>Category: {sub.category}</p>
               {sub.status === 'active' && (
                 <button
                   className="bg-red-500 text-white py-1 px-3 rounded mt-2"
@@ -172,5 +180,6 @@ const SubscriptionDashboard = () => {
 }
 
 export default SubscriptionDashboard
+
 
 
