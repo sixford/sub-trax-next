@@ -6,6 +6,9 @@ const SubscriptionSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   renewalDate: { type: Date, required: true },
   status: { type: String, enum: ['active', 'cancelled'], required: true },
+  cancellationDate: { type: Date },
+  renewalInterval: { type: String, enum: ['monthly', 'yearly'], required: true },
+  category: { type: String, required: true },
 })
 
 export default mongoose.models.Subscription || mongoose.model('Subscription', SubscriptionSchema)
