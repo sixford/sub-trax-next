@@ -32,45 +32,41 @@ const MonthlySpendChart = () => {
     const fetchSubscriptions = async () => {
       const response = await fetch('/api/subscriptions')
       const result = await response.json()
-
+  
       if (result.success) {
+        console.log('Fetched subscriptions:', result.data) // Debugging log
+        // Existing processing logic
         const monthlyData: Record<string, number> = {}
-
+  
         result.data.forEach((sub: Subscription) => {
           const startDate = new Date(sub.renewalDate)
-          const endDate = sub.status === 'active'
-            ? new Date() // Active subscriptions should include up to the current month
-            : sub.cancellationDate
+          const endDate =
+            sub.status === 'active'
+              ? new Date() // Include up to the current month for active subscriptions
+              : sub.cancellationDate
               ? new Date(sub.cancellationDate)
-              : new Date() // Default to current if no cancellation date
-          
+              : new Date() // Default to current date if no cancellation date
           const interval = sub.renewalInterval === 'monthly' ? 1 : 12
-
+  
           while (startDate <= endDate) {
             const monthYear = startDate.toLocaleString('default', {
               month: 'short',
               year: 'numeric',
             })
-
+  
             monthlyData[monthYear] = (monthlyData[monthYear] || 0) + sub.price
-
-            // Increment date by renewal interval
+  
             startDate.setMonth(startDate.getMonth() + interval)
           }
         })
-
-        // Sort months and update state
-        const sortedLabels = Object.keys(monthlyData).sort((a, b) => {
-          const dateA = new Date(a)
-          const dateB = new Date(b)
-          return dateA.getTime() - dateB.getTime()
-        })
-
-        setLabels(sortedLabels)
-        setSpendingData(sortedLabels.map((label) => monthlyData[label]))
+  
+        console.log('Processed monthly data:', monthlyData) // Debugging log
+  
+        setLabels(Object.keys(monthlyData).sort())
+        setSpendingData(Object.values(monthlyData))
       }
     }
-
+  
     fetchSubscriptions()
   }, [])
 
