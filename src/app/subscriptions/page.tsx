@@ -107,7 +107,7 @@ const SubscriptionDashboard = () => {
 
       {/* Monthly Spending Chart */}
       <div className="mb-8">
-        <SpendingChart />
+        <SpendingChart subscriptions={subscriptions} />
       </div>
 
       <div className="mb-4 flex justify-between">
