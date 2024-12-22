@@ -34,22 +34,27 @@ const MonthlySpendChart = () => {
       const result = await response.json()
 
       if (result.success) {
-        // Group spending by month
         const monthlyData: Record<string, number> = {}
 
         result.data.forEach((sub: Subscription) => {
-          const monthYear = new Date(sub.renewalDate).toLocaleString('default', {
-            month: 'short',
-            year: 'numeric',
-          })
+          const startDate = new Date(sub.renewalDate);
+          const endDate = sub.cancellationDate ? new Date(sub.cancellationDate) : new Date()
+          const interval = sub.renewalInterval === 'monthly' ? 1 : 12
 
-          if (!monthlyData[monthYear]) {
-            monthlyData[monthYear] = 0
+          while (startDate <= endDate) {
+            const monthYear = startDate.toLocaleString('default', {
+              month: 'short',
+              year: 'numeric',
+            })
+
+            monthlyData[monthYear] = (monthlyData[monthYear] || 0) + sub.price
+
+            // Add renewal interval
+            startDate.setMonth(startDate.getMonth() + interval)
           }
-          monthlyData[monthYear] += sub.price
-        });
+        })
 
-        setLabels(Object.keys(monthlyData))
+        setLabels(Object.keys(monthlyData).sort())
         setSpendingData(Object.values(monthlyData))
       }
     }
