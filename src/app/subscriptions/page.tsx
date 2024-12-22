@@ -52,7 +52,7 @@ const SubscriptionDashboard = () => {
   }, [status, session])
 
   const handleDelete = async (id: string) => {
-    const confirmDelete = confirm('Are you sure you want to delete this subscription?')
+    const confirmDelete = confirm('Are you sure you want to cancel this subscription?')
     if (!confirmDelete) return
 
     try {
@@ -91,9 +91,11 @@ const SubscriptionDashboard = () => {
     }
     return a.price - b.price
   })
+
   if (status === 'loading') {
     return <p>Loading...</p>
   }
+
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Your Subscriptions</h2>
@@ -122,8 +124,9 @@ const SubscriptionDashboard = () => {
           <button
             key={status}
             onClick={() => setFilter(status as 'all' | 'active' | 'cancelled')}
-            className={`px-4 py-2 rounded ${filter === status ? 'bg-blue-500 text-white' : 'bg-gray-200'
-              }`}
+            className={`px-4 py-2 rounded ${
+              filter === status ? 'bg-blue-500 text-white' : 'bg-gray-200'
+            }`}
           >
             {status.charAt(0).toUpperCase() + status.slice(1)}
           </button>
@@ -150,12 +153,14 @@ const SubscriptionDashboard = () => {
               <p>Price: £{sub.price}</p>
               <p>Renewal Date: {new Date(sub.renewalDate).toLocaleDateString()}</p>
               <p>Status: {sub.status}</p>
-              <button
-                className="bg-red-500 text-white py-1 px-3 rounded mt-2"
-                onClick={() => handleDelete(sub._id)}
-              >
-                Delete
-              </button>
+              {sub.status === 'active' && (
+                <button
+                  className="bg-red-500 text-white py-1 px-3 rounded mt-2"
+                  onClick={() => handleDelete(sub._id)}
+                >
+                  Cancel
+                </button>
+              )}
             </div>
           ))
         ) : (
