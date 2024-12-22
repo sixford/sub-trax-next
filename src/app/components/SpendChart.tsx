@@ -16,8 +16,12 @@ import { Line } from 'react-chartjs-2'
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 interface Subscription {
-  renewalDate: string
+  name: string
   price: number
+  renewalDate: string
+  status: 'active' | 'cancelled'
+  renewalInterval: 'monthly' | 'yearly'
+  cancellationDate?: string
 }
 
 const MonthlySpendChart = () => {
