@@ -34,7 +34,7 @@ const MonthlySpendChart = () => {
       const response = await fetch('/api/subscriptions')
       const result = await response.json()
 
-      console.log('Fetched Subscriptions for Chart:', result)
+      console.log('Fetched Subscriptions for Chart:', result.data)
 
       if (result.success) {
         const monthlyData: Record<string, number> = {}
