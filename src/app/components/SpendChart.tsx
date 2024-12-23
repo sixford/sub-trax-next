@@ -40,10 +40,15 @@ const MonthlySpendChart = () => {
         const monthlyData: Record<string, number> = {}
 
         result.data.forEach((sub: Subscription) => {
-          if (sub.status === 'cancelled') return
           const startDate = new Date(sub.renewalDate)
           const endDate = sub.cancellationDate ? new Date(sub.cancellationDate) : new Date()
           const interval = sub.renewalInterval === 'monthly' ? 1 : 12
+
+          // Ensure startDate <= endDate
+          if (startDate > endDate) {
+            console.error(`Invalid date range for subscription: ${sub.name}`)
+            return
+          }
 
           console.log('Subscription:', sub.name)
           console.log('Start Date:', startDate)
