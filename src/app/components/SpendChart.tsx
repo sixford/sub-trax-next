@@ -45,6 +45,11 @@ const MonthlySpendChart = () => {
           const endDate = sub.cancellationDate ? new Date(sub.cancellationDate) : new Date()
           const interval = sub.renewalInterval === 'monthly' ? 1 : 12
 
+          console.log('Subscription:', sub.name)
+          console.log('Start Date:', startDate)
+          console.log('End Date:', endDate)
+          console.log('Interval:', interval)
+
           while (startDate <= endDate) {
             const monthYear = startDate.toLocaleString('default', {
               month: 'short',
@@ -52,6 +57,8 @@ const MonthlySpendChart = () => {
             })
 
             monthlyData[monthYear] = (monthlyData[monthYear] || 0) + sub.price
+
+            console.log('MonthYear:', monthYear, 'Price:', sub.price)
 
             startDate.setMonth(startDate.getMonth() + interval)
           }
