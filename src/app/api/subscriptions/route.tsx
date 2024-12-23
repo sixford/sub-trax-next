@@ -5,7 +5,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 
 // GET: Fetch all subscriptions
-export async function GET(request: Request) {
+export async function GET() {
   await dbConnect()
 
   const session = await getServerSession(authOptions)
