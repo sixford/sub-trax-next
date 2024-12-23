@@ -42,9 +42,11 @@ const MonthlySpendChart = () => {
         result.data.forEach((sub: Subscription) => {
           const startDate = new Date(sub.renewalDate)
           const endDate =
-            sub.cancellationDate && new Date(sub.cancellationDate) > new Date()
-              ? new Date(sub.cancellationDate)
-              : new Date()
+            sub.status === 'cancelled'
+              ? sub.cancellationDate
+                ? new Date(sub.cancellationDate)
+                : new Date() // Fallback for missing cancellationDate
+              : new Date(new Date().setFullYear(new Date().getFullYear() + 1)) // Project active subscriptions 1 year into the future
         
           // Ensure startDate <= endDate
           if (startDate > endDate) {
@@ -61,11 +63,11 @@ const MonthlySpendChart = () => {
               month: 'short',
               year: 'numeric',
             })
-
+        
             monthlyData[monthYear] = (monthlyData[monthYear] || 0) + sub.price
-
+        
             console.log('MonthYear:', monthYear, 'Price:', sub.price)
-
+        
             startDate.setMonth(startDate.getMonth() + interval)
           }
         })
