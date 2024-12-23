@@ -41,20 +41,21 @@ const MonthlySpendChart = () => {
 
         result.data.forEach((sub: Subscription) => {
           const startDate = new Date(sub.renewalDate)
-          const endDate = sub.cancellationDate ? new Date(sub.cancellationDate) : new Date()
-          const interval = sub.renewalInterval === 'monthly' ? 1 : 12
-
+          const endDate =
+            sub.cancellationDate && new Date(sub.cancellationDate) > new Date()
+              ? new Date(sub.cancellationDate)
+              : new Date()
+        
           // Ensure startDate <= endDate
           if (startDate > endDate) {
-            console.error(`Invalid date range for subscription: ${sub.name}`)
+            console.error(
+              `Invalid date range for subscription: ${sub.name}. Start Date: ${startDate}, End Date: ${endDate}`
+            )
             return
           }
-
-          console.log('Subscription:', sub.name)
-          console.log('Start Date:', startDate)
-          console.log('End Date:', endDate)
-          console.log('Interval:', interval)
-
+        
+          const interval = sub.renewalInterval === 'monthly' ? 1 : 12
+        
           while (startDate <= endDate) {
             const monthYear = startDate.toLocaleString('default', {
               month: 'short',
