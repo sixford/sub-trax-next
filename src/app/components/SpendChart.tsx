@@ -25,67 +25,62 @@ interface Subscription {
   cancellationDate?: string
 }
 
-const MonthlySpendChart = () => {
+interface SpendingChartProps {
+  subscriptions: Subscription[]
+}
+
+const MonthlySpendChart = ({ subscriptions }: SpendingChartProps) => {
   const [spendingData, setSpendingData] = useState<number[]>([])
   const [labels, setLabels] = useState<string[]>([])
 
   useEffect(() => {
-    const fetchSubscriptions = async () => {
-      const response = await fetch('/api/subscriptions')
-      const result = await response.json()
+    const processSubscriptions = () => {
+      const monthlyData: Record<string, number> = {}
 
-      console.log('Fetched Subscriptions for Chart:', result.data)
+      subscriptions.forEach((sub) => {
+        const startDate = new Date(sub.renewalDate)
+        const today = new Date()
 
-      if (result.success) {
-        const monthlyData: Record<string, number> = {}
+        // Calculate endDate based on subscription status
+        let endDate =
+          sub.status === 'cancelled'
+            ? sub.cancellationDate
+              ? new Date(sub.cancellationDate)
+              : today // Default to today if cancellationDate is missing
+            : new Date(today.setFullYear(today.getFullYear() + 1)) // Project active subs 1 year into the future
 
-        result.data.forEach((sub: Subscription) => {
-          const startDate = new Date(sub.renewalDate)
-          const endDate =
-            sub.status === 'cancelled'
-              ? sub.cancellationDate
-                ? new Date(sub.cancellationDate)
-                : new Date() // Fallback for missing cancellationDate
-              : new Date(new Date().setFullYear(new Date().getFullYear() + 1)) // Project active subscriptions 1 year into the future
-        
-          // Ensure startDate <= endDate
-          if (startDate > endDate) {
-            console.error(
-              `Invalid date range for subscription: ${sub.name}. Start Date: ${startDate}, End Date: ${endDate}`
-            )
-            return
-          }
-        
-          const interval = sub.renewalInterval === 'monthly' ? 1 : 12
-        
-          while (startDate <= endDate) {
-            const monthYear = startDate.toLocaleString('default', {
-              month: 'short',
-              year: 'numeric',
-            })
-        
-            monthlyData[monthYear] = (monthlyData[monthYear] || 0) + sub.price
-        
-            console.log('MonthYear:', monthYear, 'Price:', sub.price)
-        
-            startDate.setMonth(startDate.getMonth() + interval)
-          }
-        })
+        // Ensure startDate <= endDate
+        if (startDate > endDate) {
+          console.warn(
+            `Invalid date range for subscription: ${sub.name}. Start Date: ${startDate}, End Date: ${endDate}. Adjusting endDate to match startDate.`
+          )
+          endDate = new Date(startDate) // Adjust endDate to match startDate
+        }
 
-        console.log('Processed Monthly Data:', monthlyData)
+        const interval = sub.renewalInterval === 'monthly' ? 1 : 12
 
-        // Sort by date
-        const sortedMonths = Object.keys(monthlyData).sort((a, b) =>
-          new Date(a).getTime() - new Date(b).getTime()
-        )
+        while (startDate <= endDate) {
+          const monthYear = startDate.toLocaleString('default', {
+            month: 'short',
+            year: 'numeric',
+          })
 
-        setLabels(sortedMonths)
-        setSpendingData(sortedMonths.map((month) => monthlyData[month]))
-      }
+          monthlyData[monthYear] = (monthlyData[monthYear] || 0) + sub.price
+
+          startDate.setMonth(startDate.getMonth() + interval)
+        }
+      })
+
+      const sortedMonths = Object.keys(monthlyData).sort((a, b) =>
+        new Date(a).getTime() - new Date(b).getTime()
+      )
+
+      setLabels(sortedMonths)
+      setSpendingData(sortedMonths.map((month) => monthlyData[month]))
     }
 
-    fetchSubscriptions()
-  }, [])
+    processSubscriptions()
+  }, [subscriptions])
 
   const chartData = {
     labels,
@@ -104,13 +99,8 @@ const MonthlySpendChart = () => {
   const chartOptions = {
     responsive: true,
     plugins: {
-      legend: {
-        position: 'top' as const,
-      },
-      title: {
-        display: true,
-        text: 'Monthly Spending',
-      },
+      legend: { position: 'top' as const },
+      title: { display: true, text: 'Monthly Spending' },
     },
   }
 
@@ -118,5 +108,10 @@ const MonthlySpendChart = () => {
 }
 
 export default MonthlySpendChart
+
+
+
+
+
 
 

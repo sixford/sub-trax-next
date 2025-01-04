@@ -166,7 +166,7 @@ const SubscriptionDashboard = () => {
                   className="bg-red-500 text-white py-1 px-3 rounded mt-2"
                   onClick={() => handleDelete(sub._id)}
                 >
-                  Cancel
+                  Delete
                 </button>
               )}
             </div>
@@ -180,6 +180,7 @@ const SubscriptionDashboard = () => {
 }
 
 export default SubscriptionDashboard
+
 
 
 
