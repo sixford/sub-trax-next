@@ -38,23 +38,26 @@ const MonthlySpendChart = ({ subscriptions }: SpendingChartProps) => {
       const monthlyData: Record<string, number> = {}
 
       subscriptions.forEach((sub) => {
+        // Skip processing if subscription is canceled and cancellation date is in the past
+        if (sub.status === 'cancelled' && sub.cancellationDate && new Date(sub.cancellationDate) < new Date()) {
+          return
+        }
+
         const startDate = new Date(sub.renewalDate)
         const today = new Date()
-
-        // Calculate endDate based on subscription status
-        let endDate =
+        const endDate =
           sub.status === 'cancelled'
             ? sub.cancellationDate
               ? new Date(sub.cancellationDate)
               : today // Default to today if cancellationDate is missing
-            : new Date(today.setFullYear(today.getFullYear() + 1)) // Project active subs 1 year into the future
+            : new Date(today.setFullYear(today.getFullYear() + 1)) // Project active subscriptions 1 year into the future
 
         // Ensure startDate <= endDate
         if (startDate > endDate) {
-          console.warn(
-            `Invalid date range for subscription: ${sub.name}. Start Date: ${startDate}, End Date: ${endDate}. Adjusting endDate to match startDate.`
+          console.error(
+            `Invalid date range for subscription: ${sub.name}. Start Date: ${startDate}, End Date: ${endDate}`
           )
-          endDate = new Date(startDate) // Adjust endDate to match startDate
+          return
         }
 
         const interval = sub.renewalInterval === 'monthly' ? 1 : 12
@@ -71,6 +74,7 @@ const MonthlySpendChart = ({ subscriptions }: SpendingChartProps) => {
         }
       })
 
+      // Sort and process monthly data
       const sortedMonths = Object.keys(monthlyData).sort((a, b) =>
         new Date(a).getTime() - new Date(b).getTime()
       )
@@ -108,6 +112,7 @@ const MonthlySpendChart = ({ subscriptions }: SpendingChartProps) => {
 }
 
 export default MonthlySpendChart
+
 
 
 
