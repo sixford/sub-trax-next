@@ -83,8 +83,16 @@ const SubscriptionDashboard = () => {
   if (status === 'loading') return <p>Loading...</p>
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ivoryBackground to-purpleMain flex justify-center items-center">
-      <div className="card w-11/12 max-w-4xl bg-white rounded-lg shadow-lg p-8">
+    <div className="h-screen flex flex-col justify-center items-center text-center relative overflow-hidden">
+      {/* Lava Lamp Background */}
+      <div className="absolute inset-0 -z-10">
+        <div className="blob bg-purpleMain"></div>
+        <div className="blob bg-goldAccent animation-delay-2000"></div>
+        <div className="blob bg-pinkAccent animation-delay-4000"></div>
+      </div>
+
+      {/* Content Card */}
+      <div className="w-11/12 max-w-4xl bg-white/90 rounded-lg shadow-lg p-8 relative z-10">
         <h2 className="text-2xl font-bold text-purpleMain mb-4">Your Subscriptions</h2>
         <div className="mb-8">
           <SpendingChart subscriptions={subscriptions} />
@@ -157,3 +165,5 @@ const SubscriptionDashboard = () => {
 }
 
 export default SubscriptionDashboard
+
+

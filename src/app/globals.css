@@ -37,4 +37,40 @@ body {
   padding: 16px;
 }
 
+/* Lava Lamp Blob Styles */
+.blob {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  filter: blur(100px);
+  animation: moveBubbles 10s infinite alternate ease-in-out;
+}
+
+.bg-purpleMain {
+  background-color: #6c36e8;
+}
+
+.bg-goldAccent {
+  background-color: #ffc107;
+}
+
+.bg-pinkAccent {
+  background-color: #ff6f61;
+}
+
+@keyframes moveBubbles {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-50px, 30px);
+  }
+  100% {
+    transform: translate(50px, -30px);
+  }
+}
+
+
+
 

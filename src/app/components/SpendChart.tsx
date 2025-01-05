@@ -32,13 +32,13 @@ interface SpendingChartProps {
 
 const getColor = (category: string, alpha = 1) => {
   const colors: Record<string, string> = {
-    All: `rgba(255, 87, 51, ${alpha})`, // Vibrant red
-    Entertainment: `rgba(255, 195, 0, ${alpha})`, // Bright yellow
-    Utilities: `rgba(0, 168, 255, ${alpha})`, // Sky blue
-    Food: `rgba(240, 78, 151, ${alpha})`, // Pinkish hue
-    Software: `rgba(137, 196, 244, ${alpha})`, // Soft blue
-    Transport: `rgba(82, 196, 26, ${alpha})`, // Green
-    Other: `rgba(144, 19, 254, ${alpha})`, // Deep purple
+    All: `rgba(255, 87, 51, ${alpha})`,
+    Entertainment: `rgba(255, 195, 0, ${alpha})`,
+    Utilities: `rgba(0, 168, 255, ${alpha})`,
+    Food: `rgba(240, 78, 151, ${alpha})`,
+    Software: `rgba(137, 196, 244, ${alpha})`,
+    Transport: `rgba(82, 196, 26, ${alpha})`,
+    Other: `rgba(144, 19, 254, ${alpha})`,
   }
   return colors[category] || `rgba(0, 0, 0, ${alpha})`
 }
@@ -162,7 +162,7 @@ const MonthlySpendChart = ({ subscriptions }: SpendingChartProps) => {
         ticks: { color: '#fff', font: { family: 'Poppins', size: 12 } },
       },
       y: {
-        grid: { color: 'rgba(255, 255, 255, 0.2)' },
+        grid: { display: false },
         ticks: { color: '#fff', font: { family: 'Poppins', size: 12 } },
       },
     },
@@ -173,7 +173,7 @@ const MonthlySpendChart = ({ subscriptions }: SpendingChartProps) => {
   }
 
   return (
-    <div className="bg-gradient-to-br from-purple-700 via-pink-500 to-yellow-500 p-8 rounded-xl shadow-xl">
+    <div className="relative bg-gradient-to-br from-purple-700 via-pink-500 to-yellow-500 p-8 rounded-xl shadow-xl">
       <div className="flex flex-wrap justify-center gap-4 mb-6">
         {categories.map((category) => (
           <button
@@ -189,7 +189,7 @@ const MonthlySpendChart = ({ subscriptions }: SpendingChartProps) => {
           </button>
         ))}
       </div>
-      <div className="relative h-[400px]">
+      <div className="relative h-[300px] w-full">
         <Line data={chartData} options={chartOptions} />
       </div>
     </div>
@@ -197,6 +197,8 @@ const MonthlySpendChart = ({ subscriptions }: SpendingChartProps) => {
 }
 
 export default MonthlySpendChart
+
+
 
 
 
