@@ -1,7 +1,7 @@
 'use client'
 
 import './globals.css'
-import Header from './components/Header'
+// import Header from './components/Header'
 import { SessionProvider } from 'next-auth/react'
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <SessionProvider>
-          <Header />
+          {/* <Header /> */}
           <main>{children}</main>
         </SessionProvider>
       </body>
