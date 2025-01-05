@@ -8,6 +8,7 @@ const RegisterPage = () => {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -18,19 +19,27 @@ const RegisterPage = () => {
       return
     }
 
-    // Registration data to your backend
-    const response = await fetch('/api/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    })
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      })
 
-    if (response.ok) {
-      router.push('/login')
-    } else {
-      setError('Failed to register. Try again.')
+      const result = await response.json()
+
+      if (response.ok) {
+        setSuccessMessage('Registration successful! Redirecting to login...')
+        setTimeout(() => {
+          router.push('/login')
+        }, 2000)
+      } else {
+        setError(result.message || 'Failed to register. Try again.')
+      }
+    } catch (err) {
+      setError('Something went wrong. Please try again.')
     }
   }
 
@@ -38,6 +47,7 @@ const RegisterPage = () => {
     <div className="h-screen flex flex-col justify-center items-center bg-ivoryBackground">
       <div className="bg-white p-8 rounded-lg shadow-md max-w-sm w-full">
         <h1 className="text-2xl font-bold mb-6 text-purpleMain">Register</h1>
+        {successMessage && <p className="text-green-500 text-sm mb-4">{successMessage}</p>}
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -83,3 +93,4 @@ const RegisterPage = () => {
 }
 
 export default RegisterPage
+
