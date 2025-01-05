@@ -30,6 +30,19 @@ interface SpendingChartProps {
   subscriptions: Subscription[]
 }
 
+const getColor = (category: string, alpha = 1) => {
+  const colors: Record<string, string> = {
+    All: `rgba(255, 87, 51, ${alpha})`, // Vibrant red
+    Entertainment: `rgba(255, 195, 0, ${alpha})`, // Bright yellow
+    Utilities: `rgba(0, 168, 255, ${alpha})`, // Sky blue
+    Food: `rgba(240, 78, 151, ${alpha})`, // Pinkish hue
+    Software: `rgba(137, 196, 244, ${alpha})`, // Soft blue
+    Transport: `rgba(82, 196, 26, ${alpha})`, // Green
+    Other: `rgba(144, 19, 254, ${alpha})`, // Deep purple
+  }
+  return colors[category] || `rgba(0, 0, 0, ${alpha})`
+}
+
 const MonthlySpendChart = ({ subscriptions }: SpendingChartProps) => {
   const [spendingData, setSpendingData] = useState<Record<string, number[]>>({})
   const [labels, setLabels] = useState<string[]>([])
@@ -37,24 +50,10 @@ const MonthlySpendChart = ({ subscriptions }: SpendingChartProps) => {
 
   const categories = ['All', 'Entertainment', 'Utilities', 'Food', 'Software', 'Transport', 'Other']
 
-  const getColor = (category: string, alpha = 1) => {
-    const colors: Record<string, string> = {
-      All: `rgba(108, 54, 232, ${alpha})`,
-      Entertainment: `rgba(255, 99, 132, ${alpha})`,
-      Utilities: `rgba(54, 162, 235, ${alpha})`,
-      Food: `rgba(75, 192, 192, ${alpha})`,
-      Software: `rgba(153, 102, 255, ${alpha})`,
-      Transport: `rgba(255, 159, 64, ${alpha})`,
-      Other: `rgba(201, 203, 207, ${alpha})`,
-    }
-    return colors[category] || `rgba(0, 0, 0, ${alpha})`
-  }
-
   useEffect(() => {
     const processSubscriptions = () => {
       const monthlyData: Record<string, Record<string, number>> = {}
 
-      // Initialize data for each category
       categories.forEach((category) => {
         monthlyData[category] = {}
       })
@@ -62,8 +61,6 @@ const MonthlySpendChart = ({ subscriptions }: SpendingChartProps) => {
       subscriptions.forEach((sub) => {
         const startDate = new Date(sub.renewalDate)
         const today = new Date()
-
-        // Calculate endDate based on subscription status
         const endDate =
           sub.status === 'cancelled'
             ? sub.cancellationDate
@@ -71,12 +68,7 @@ const MonthlySpendChart = ({ subscriptions }: SpendingChartProps) => {
               : today
             : new Date(today.setFullYear(today.getFullYear() + 1))
 
-        if (startDate > endDate) {
-          console.error(
-            `Invalid date range for subscription: ${sub.name}. Start Date: ${startDate}, End Date: ${endDate}`
-          )
-          return
-        }
+        if (startDate > endDate) return
 
         const interval = sub.renewalInterval === 'monthly' ? 1 : 12
 
@@ -125,7 +117,12 @@ const MonthlySpendChart = ({ subscriptions }: SpendingChartProps) => {
       borderColor: getColor(category),
       backgroundColor: getColor(category, 0.3),
       fill: true,
-      tension: 0.4,
+      tension: 0.5,
+      borderWidth: 3,
+      pointBorderWidth: 2,
+      pointHoverRadius: 8,
+      pointHoverBackgroundColor: getColor(category),
+      pointHoverBorderWidth: 3,
     })),
   }
 
@@ -134,92 +131,65 @@ const MonthlySpendChart = ({ subscriptions }: SpendingChartProps) => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top',
+        position: 'top' as const,
         labels: {
-          font: {
-            family: 'Poppins, sans-serif',
-            size: 12,
-          },
-        },
-        onClick: (e, legendItem, chart) => {
-          const index = chart.data.datasets.findIndex(
-            (dataset) => dataset.label === legendItem.text
-          )
-          chart.setDatasetVisibility(index, !chart.isDatasetVisible(index))
-          chart.update()
-        },
-      },
-      tooltip: {
-        callbacks: {
-          label: (context) => {
-            const value = context.raw
-            const category = context.dataset.label
-            return `${category}: £${value.toFixed(2)}`
-          },
+          font: { family: 'Poppins', size: 14 },
+          color: '#fff',
+          padding: 15,
+          usePointStyle: true,
         },
       },
       title: {
         display: true,
         text: 'Monthly Spending by Category',
-        font: {
-          family: 'Poppins, sans-serif',
-          size: 18,
+        font: { family: 'Poppins', size: 20 },
+        color: '#fff',
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        titleFont: { family: 'Poppins', size: 16 },
+        bodyFont: { family: 'Poppins', size: 14 },
+        borderColor: '#fff',
+        borderWidth: 1,
+        callbacks: {
+          label: (context: any) => `£${context.raw.toFixed(2)}`,
         },
       },
     },
     scales: {
       x: {
-        type: 'category',
-        title: {
-          display: true,
-          text: 'Month',
-          color: '#6c36e8',
-          font: {
-            size: 16,
-            family: 'Poppins, sans-serif',
-          },
-        },
+        grid: { display: false },
+        ticks: { color: '#fff', font: { family: 'Poppins', size: 12 } },
       },
       y: {
-        title: {
-          display: true,
-          text: 'Spending (£)',
-          color: '#6c36e8',
-          font: {
-            size: 16,
-            family: 'Poppins, sans-serif',
-          },
-        },
+        grid: { color: 'rgba(255, 255, 255, 0.2)' },
+        ticks: { color: '#fff', font: { family: 'Poppins', size: 12 } },
       },
     },
     animation: {
-      duration: 1000,
-      easing: 'easeInOutCubic',
-    },
-    elements: {
-      point: {
-        radius: 5,
-        hoverRadius: 8,
-      },
+      duration: 1500,
+      easing: 'easeInOutElastic',
     },
   }
 
   return (
-    <div>
-      <div className="flex space-x-4 mb-4">
+    <div className="bg-gradient-to-br from-purple-700 via-pink-500 to-yellow-500 p-8 rounded-xl shadow-xl">
+      <div className="flex flex-wrap justify-center gap-4 mb-6">
         {categories.map((category) => (
           <button
             key={category}
             onClick={() => toggleCategory(category)}
-            className={`px-4 py-2 rounded shadow-md ${
-              activeCategories.includes(category) ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'
-            }`}
+            className={`px-4 py-2 rounded-full shadow-lg ${
+              activeCategories.includes(category)
+                ? 'bg-gradient-to-r from-yellow-400 to-pink-500 text-white'
+                : 'bg-gray-200 hover:bg-gray-300'
+            } transition duration-300`}
           >
             {category}
           </button>
         ))}
       </div>
-      <div className="relative h-96 w-full">
+      <div className="relative h-[400px]">
         <Line data={chartData} options={chartOptions} />
       </div>
     </div>
@@ -227,6 +197,9 @@ const MonthlySpendChart = ({ subscriptions }: SpendingChartProps) => {
 }
 
 export default MonthlySpendChart
+
+
+
 
 
 
