@@ -131,9 +131,76 @@ const MonthlySpendChart = ({ subscriptions }: SpendingChartProps) => {
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
-      legend: { position: 'top' as const },
-      title: { display: true, text: 'Monthly Spending' },
+      legend: {
+        position: 'top',
+        labels: {
+          font: {
+            family: 'Poppins, sans-serif',
+            size: 12,
+          },
+        },
+        onClick: (e, legendItem, chart) => {
+          const index = chart.data.datasets.findIndex(
+            (dataset) => dataset.label === legendItem.text
+          )
+          chart.setDatasetVisibility(index, !chart.isDatasetVisible(index))
+          chart.update()
+        },
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            const value = context.raw
+            const category = context.dataset.label
+            return `${category}: £${value.toFixed(2)}`
+          },
+        },
+      },
+      title: {
+        display: true,
+        text: 'Monthly Spending by Category',
+        font: {
+          family: 'Poppins, sans-serif',
+          size: 18,
+        },
+      },
+    },
+    scales: {
+      x: {
+        type: 'category',
+        title: {
+          display: true,
+          text: 'Month',
+          color: '#6c36e8',
+          font: {
+            size: 16,
+            family: 'Poppins, sans-serif',
+          },
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: 'Spending (£)',
+          color: '#6c36e8',
+          font: {
+            size: 16,
+            family: 'Poppins, sans-serif',
+          },
+        },
+      },
+    },
+    animation: {
+      duration: 1000,
+      easing: 'easeInOutCubic',
+    },
+    elements: {
+      point: {
+        radius: 5,
+        hoverRadius: 8,
+      },
     },
   }
 
@@ -152,12 +219,15 @@ const MonthlySpendChart = ({ subscriptions }: SpendingChartProps) => {
           </button>
         ))}
       </div>
-      <Line data={chartData} options={chartOptions} />
+      <div className="relative h-96 w-full">
+        <Line data={chartData} options={chartOptions} />
+      </div>
     </div>
   )
 }
 
 export default MonthlySpendChart
+
 
 
 
